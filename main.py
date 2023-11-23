@@ -4,7 +4,10 @@ from random import choice
 
 card_words = {}
 
-french_words = pandas.read_csv("data/french_words.csv")
+try:
+    french_words = pandas.read_csv('data/left_to_learn.csv')
+except FileNotFoundError:
+    french_words = pandas.read_csv("data/french_words.csv")
 french_english_dict = french_words.to_dict(orient='records')
 
 def correct_word_in_french(card_words):
@@ -26,7 +29,13 @@ def next_card():
     canvas.itemconfig(card_word, text=card_word_english)
     canvas.itemconfig(card_language, text='English')
     window_timer = window.after(3000, correct_word_in_french, card_words)
+    
 
+def correct_answer():
+    french_english_dict.remove(card_words)
+    data = pandas.DataFrame(french_english_dict)
+    data.to_csv('data/left_to_learn.csv', index=False)
+    next_card()
 
 
 BACKGROUND_COLOR = "#B1DDC6"
@@ -50,9 +59,7 @@ wrong_button = Button(image=wrong_button_image, highlightthickness=0, command=ne
 wrong_button.grid(row=2, column=1)
 
 right_button_image = PhotoImage(file='images/right.png')
-right_button = Button(image=right_button_image, highlightthickness=0, command=next_card)
+right_button = Button(image=right_button_image, highlightthickness=0, command=correct_answer)
 right_button.grid(row=2, column=2)
-
-
 
 window.mainloop()
